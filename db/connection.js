@@ -5,19 +5,8 @@ require("dotenv").config({
   path: `${__dirname}/../.env.${ENV}`,
 });
 
-const config = {
-  development: {
-    database: "nc_news",
-  },
-  test: {
-    database: "nc_news_test",
-  },
-};
-
-const poolConfig = config[ENV];
-
-if (!poolConfig) {
-  throw new Error("Database configuration not set for current environment");
+if (!process.env.PGDATABASE) {
+  throw new Error("PGDATABASE not set");
 }
 
-module.exports = new Pool(poolConfig);
+module.exports = new Pool();

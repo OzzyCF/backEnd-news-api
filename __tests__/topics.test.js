@@ -1,16 +1,38 @@
+const app = require("../app.js");
 const request = require("supertest");
-const app = require("../app");
-const db = require("../db/connection");
+const db = require("../db/connection.js");
+const seed = require("../db/seeds/seed.js");
+const data = require("../db/data/test-data/index.js");
+beforeEach(() => {
+  return seed(data);
+});
 
 afterAll(() => {
-  db.end();
+  return db.end();
 });
 
 describe("GET /api/topics", () => {
-  test("should respond with an array of topics", async () => {
-    const response = await request(app).get("/api/topics");
-    expect(response.statusCode).toBe(200);
-    expect(response.body.topics).toBeArray();
-    expect(response.body.topics[0]).toContainKeys(["slug", "description"]);
+  // 1. Testing for correct status code and response structure.
+  it("should return 200 and an array of topics", () => {
+    return request(app)
+      .get("/api/topics")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.topics).toBeInstanceOf(Array);
+        expect(body.topics.length).toBeGreaterThan(0); // Ensure we have topics.
+      });
+  });
+
+  // 2. Testing that each topic has the expected properties.
+  it("topics should have slug and description properties", () => {
+    return request(app)
+      .get("/api/topics")
+      .expect(200)
+      .then(({ body }) => {
+        body.topics.forEach((topic) => {
+          expect(topic).toHaveProperty("slug");
+          expect(topic).toHaveProperty("description");
+        });
+      });
   });
 });
