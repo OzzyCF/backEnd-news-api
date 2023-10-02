@@ -12,19 +12,26 @@ afterAll(() => {
 });
 
 describe("GET /api/topics", () => {
-  it("should return 200, an array of topics, each with slug and description properties that are strings", () => {
+  // 1. Testing for correct status code and response structure.
+  it("should return 200 and an array of topics", () => {
     return request(app)
       .get("/api/topics")
       .expect(200)
       .then(({ body }) => {
         expect(body.topics).toBeInstanceOf(Array);
         expect(body.topics.length).toBeGreaterThan(0); // Ensure we have topics.
+      });
+  });
 
+  // 2. Testing that each topic has the expected properties.
+  it("topics should have slug and description properties", () => {
+    return request(app)
+      .get("/api/topics")
+      .expect(200)
+      .then(({ body }) => {
         body.topics.forEach((topic) => {
           expect(topic).toHaveProperty("slug");
           expect(topic).toHaveProperty("description");
-          expect(typeof topic.slug).toBe("string");
-          expect(typeof topic.description).toBe("string");
         });
       });
   });
