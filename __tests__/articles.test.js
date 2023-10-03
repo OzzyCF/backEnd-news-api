@@ -55,46 +55,46 @@ describe("/api/articles/:article_id", () => {
       });
     });
   });
+});
 
-  describe("/api/articles", () => {
-    describe("GET", () => {
-      describe("Status 200", () => {
-        it("should return all articles with the correct structure and without body", () => {
-          return request(app)
-            .get("/api/articles")
-            .expect(200)
-            .then(({ body }) => {
-              // Check if it's an array
-              expect(body.articles).toBeInstanceOf(Array);
+describe("/api/articles", () => {
+  describe("GET", () => {
+    describe("Status 200", () => {
+      it("should return all articles with the correct structure and without body", () => {
+        return request(app)
+          .get("/api/articles")
+          .expect(200)
+          .then(({ body }) => {
+            // Check if it's an array
+            expect(body.articles).toBeInstanceOf(Array);
 
-              // Iterate through all articles and check their structure
-              body.articles.forEach((article) => {
-                expect(article).toMatchObject({
-                  author: expect.any(String),
-                  title: expect.any(String),
-                  article_id: expect.any(Number),
-                  topic: expect.any(String),
-                  created_at: expect.any(String),
-                  votes: expect.any(Number),
-                  article_img_url: expect.any(String),
-                  comment_count: expect.any(Number),
-                });
-                // Check for the absence of the body property for each article
-                expect(article).not.toHaveProperty("body");
+            // Iterate through all articles and check their structure
+            body.articles.forEach((article) => {
+              expect(article).toMatchObject({
+                author: expect.any(String),
+                title: expect.any(String),
+                article_id: expect.any(Number),
+                topic: expect.any(String),
+                created_at: expect.any(String),
+                votes: expect.any(Number),
+                article_img_url: expect.any(String),
+                comment_count: expect.any(Number),
               });
+              // Check for the absence of the body property for each article
+              expect(article).not.toHaveProperty("body");
             });
-        });
+          });
+      });
 
-        it("should return articles sorted by date in descending order", () => {
-          return request(app)
-            .get("/api/articles")
-            .expect(200)
-            .then(({ body }) => {
-              expect(body.articles).toBeSortedBy("created_at", {
-                descending: true,
-              });
+      it("should return articles sorted by date in descending order", () => {
+        return request(app)
+          .get("/api/articles")
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.articles).toBeSortedBy("created_at", {
+              descending: true,
             });
-        });
+          });
       });
     });
   });
