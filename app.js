@@ -3,6 +3,7 @@ const app = express();
 const { getAllTopics } = require("./controllers/topics");
 const endpoints = require("./endpoints.json");
 const { getArticleById } = require("./controllers/articles");
+const { fetchArticles } = require("./controllers/articles");
 
 // Documentation route
 app.get("/api", (req, res) => {
@@ -10,6 +11,8 @@ app.get("/api", (req, res) => {
 });
 
 app.get("/api/topics", getAllTopics);
+
+app.get("/api/articles", fetchArticles);
 
 app.get("/api/articles/:article_id", getArticleById);
 
