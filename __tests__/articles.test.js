@@ -99,3 +99,57 @@ describe("/api/articles", () => {
     });
   });
 });
+
+describe("/api/articles/:article_id/comments", () => {
+  describe("GET", () => {
+    describe("Status 200", () => {
+      it("should respond with an array of comments for the given article_id", () => {
+        return request(app)
+          .get("/api/articles/1/comments")
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.comments).toBeInstanceOf(Array);
+            expect(body.comments[0]).toHaveProperty("comment_id");
+            expect(body.comments[0]).toHaveProperty("votes");
+            expect(body.comments[0]).toHaveProperty("created_at");
+            expect(body.comments[0]).toHaveProperty("author");
+            expect(body.comments[0]).toHaveProperty("body");
+            expect(body.comments[0]).toHaveProperty("article_id");
+          });
+      });
+
+      it("comments are served with the most recent first", () => {
+        return request(app)
+          .get("/api/articles/1/comments")
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.comments).toBeSortedBy("created_at", {
+              descending: true,
+            });
+          });
+      });
+    });
+
+    describe("Status 400", () => {
+      it("should respond with an error when given an invalid article_id", () => {
+        return request(app)
+          .get("/api/articles/not-a-valid-id/comments")
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).toBe("Invalid input");
+          });
+      });
+    });
+
+    describe("Status 404", () => {
+      it("should respond with an error when the article_id does not exist", () => {
+        return request(app)
+          .get("/api/articles/9999/comments")
+          .expect(404)
+          .then(({ body }) => {
+            expect(body.msg).toBe("Article not found");
+          });
+      });
+    });
+  });
+});

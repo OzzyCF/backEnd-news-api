@@ -1,4 +1,4 @@
-\c nc_news_test
+
 
 SELECT articles.author, articles.title, articles.article_id, articles.topic, 
            articles.created_at, articles.votes, articles.article_img_url,
