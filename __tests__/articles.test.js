@@ -66,19 +66,22 @@ describe("/api/articles/:article_id", () => {
             .then(({ body }) => {
               // Check if it's an array
               expect(body.articles).toBeInstanceOf(Array);
-              // Check the structure of the first article
-              expect(body.articles[0]).toMatchObject({
-                author: expect.any(String),
-                title: expect.any(String),
-                article_id: expect.any(Number),
-                topic: expect.any(String),
-                created_at: expect.any(String),
-                votes: expect.any(Number),
-                article_img_url: expect.any(String),
-                comment_count: expect.any(Number),
+
+              // Iterate through all articles and check their structure
+              body.articles.forEach((article) => {
+                expect(article).toMatchObject({
+                  author: expect.any(String),
+                  title: expect.any(String),
+                  article_id: expect.any(Number),
+                  topic: expect.any(String),
+                  created_at: expect.any(String),
+                  votes: expect.any(Number),
+                  article_img_url: expect.any(String),
+                  comment_count: expect.any(Number),
+                });
+                // Check for the absence of the body property for each article
+                expect(article).not.toHaveProperty("body");
               });
-              // Check for the absence of the body property
-              expect(body.articles[0]).not.toHaveProperty("body");
             });
         });
 
@@ -87,19 +90,9 @@ describe("/api/articles/:article_id", () => {
             .get("/api/articles")
             .expect(200)
             .then(({ body }) => {
-              let sorted = true;
-
-              body.articles.forEach((article, index, arr) => {
-                // If it's not the first item and article date is greater than previous article date, then falsd
-                if (
-                  index !== 0 &&
-                  article.created_at > arr[index - 1].created_at
-                ) {
-                  sorted = false;
-                }
+              expect(body.articles).toBeSortedBy("created_at", {
+                descending: true,
               });
-
-              expect(sorted).toBe(true);
             });
         });
       });
