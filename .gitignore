@@ -1,2 +1,4 @@
 node_modules
 .env.*
+queryTest.txt
+queryTester.sql

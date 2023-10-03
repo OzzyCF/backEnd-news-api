@@ -98,4 +98,72 @@ describe("/api/articles", () => {
       });
     });
   });
+  describe("POST", () => {
+    describe("Status 201", () => {
+      it("should add a comment to an article and return the posted comment", () => {
+        const newComment = {
+          username: "butter_bridge",
+          body: "This is my comment!",
+        };
+
+        return request(app)
+          .post("/api/articles/1/comments")
+          .send(newComment)
+          .expect(201)
+          .then(({ body }) => {
+            expect(body.comment).toHaveProperty("comment_id");
+            expect(body.comment.author).toBe(newComment.username);
+            expect(body.comment.body).toBe(newComment.body);
+            expect(body.comment.article_id).toBe(1);
+          });
+      });
+    });
+
+    describe("Status 400", () => {
+      it("should respond with an error if the comment body is missing", () => {
+        const newComment = {
+          username: "butter_bridge",
+        };
+
+        return request(app)
+          .post("/api/articles/1/comments")
+          .send(newComment)
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).toBe("Invalid input"); // Or whatever error message you have set for this case.
+          });
+      });
+
+      it("should respond with an error if the username is missing", () => {
+        const newComment = {
+          body: "This is my comment!",
+        };
+
+        return request(app)
+          .post("/api/articles/1/comments")
+          .send(newComment)
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).toBe("Invalid input"); // Adjust as needed.
+          });
+      });
+    });
+
+    describe("Status 404", () => {
+      it("should respond with an error if the article_id does not exist", () => {
+        const newComment = {
+          username: "butter_bridge",
+          body: "This is my comment!",
+        };
+
+        return request(app)
+          .post("/api/articles/9999/comments")
+          .send(newComment)
+          .expect(404)
+          .then(({ body }) => {
+            expect(body.msg).toBe("Article not found");
+          });
+      });
+    });
+  });
 });
