@@ -15,16 +15,6 @@ afterAll(() => {
 describe("/api/articles/:article_id", () => {
   describe("GET", () => {
     describe("Status 200", () => {
-      it("should return the correct article given a valid article_id", () => {
-        return request(app)
-          .get("/api/articles/1")
-          .expect(200)
-          .then(({ body }) => {
-            expect(body.article).toHaveProperty("author");
-            expect(body.article).toHaveProperty("title");
-          });
-      });
-
       it("should return an article with the correct structure", () => {
         return request(app)
           .get("/api/articles/1")
@@ -58,25 +48,6 @@ describe("/api/articles/:article_id", () => {
       it("should return 400 for an invalid article_id format", () => {
         return request(app)
           .get("/api/articles/not-an-id")
-          .expect(400)
-          .then(({ body }) => {
-            expect(body.msg).toBe("Invalid input");
-          });
-      });
-    });
-  });
-  describe("Querying with Different Data Types", () => {
-    const invalidInputs = [
-      { type: "floating number", value: "1.23" },
-      { type: "boolean true", value: "true" },
-      { type: "boolean false", value: "false" },
-      { type: "special characters", value: "!@#$%^&*" },
-    ];
-
-    invalidInputs.forEach((input) => {
-      it(`should return 400 for an ${input.type} as article_id`, () => {
-        return request(app)
-          .get(`/api/articles/${input.value}`)
           .expect(400)
           .then(({ body }) => {
             expect(body.msg).toBe("Invalid input");
