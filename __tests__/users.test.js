@@ -29,5 +29,25 @@ describe("/api/users", () => {
           });
       });
     });
+    describe("Status 404", () => {
+      it("should return 404 for non-existent user", () => {
+        return request(app)
+          .get("/api/users/nonExistentUser123")
+          .expect(404)
+          .then(({ body }) => {
+            expect(body.msg).toBe("Route Not Found");
+          });
+      });
+
+      it("should return 404 for invalid request body", () => {
+        return request(app)
+          .post("/api/users")
+          .send({ invalidField: "value" })
+          .expect(404)
+          .then(({ body }) => {
+            expect(body.msg).toBe("Route Not Found");
+          });
+      });
+    });
   });
 });
