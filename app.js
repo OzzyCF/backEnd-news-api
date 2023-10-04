@@ -1,6 +1,6 @@
 const express = require("express");
 const app = express();
-const { getAllTopics } = require("./controllers/topics");
+
 const endpoints = require("./endpoints.json");
 const {
   getArticleById,
@@ -8,7 +8,9 @@ const {
   getArticleComments,
   postComment,
   patchVotesByArticleId,
-} = require("./controllers/articles");
+  deleteComment,
+  getAllTopics,
+} = require("./controllers/api.controller");
 const {
   handleCustomErrors,
   handlePsqlErrors,
@@ -35,6 +37,8 @@ app.post("/api/articles/:article_id/comments", postComment);
 //////PATCH///////////////////
 app.patch("/api/articles/:article_id", patchVotesByArticleId);
 
+//////DELETE/////////////////
+app.delete("/api/comments/:comment_id", deleteComment);
 // ERROR HANDLING
 app.all("*", (req, res, next) => {
   res.status(404).send({ msg: "Route Not Found" });
