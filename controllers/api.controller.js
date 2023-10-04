@@ -6,6 +6,7 @@ const {
   updateVotesByArticleId,
   removeCommentById,
   fetchAllTopics,
+  selectUsers,
 } = require("../models/api.model");
 
 ///////// ARTICLES ///////////
@@ -116,11 +117,22 @@ exports.deleteComment = (req, res, next) => {
 };
 
 ///////// TOPICS ///////////
+
 // Fetch all topics
 exports.getAllTopics = (req, res, next) => {
   fetchAllTopics()
     .then((topics) => {
       res.status(200).send({ topics });
+    })
+    .catch(next);
+};
+///////// USERS ///////////
+
+//Fetch all users
+exports.getUsers = (req, res, next) => {
+  selectUsers()
+    .then((users) => {
+      res.status(200).send({ users });
     })
     .catch(next);
 };

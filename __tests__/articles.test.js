@@ -168,16 +168,6 @@ describe("/api/articles/:article_id", () => {
             });
           });
       });
-      it("should return an empty array of comments for an article without comments", (done) => {
-        request(app)
-          .get("/api/articles/2/comments")
-          .expect(200)
-          .end((err, res) => {
-            if (err) return done(err);
-            expect(res.body.comments).toEqual([]);
-            done();
-          });
-      });
     });
 
     describe("Status 400", () => {
@@ -201,13 +191,13 @@ describe("/api/articles/:article_id", () => {
           });
       });
 
-      it("Bad request when article_id does not exist", () => {
+      it("Bad request when article_id is not a valid format", () => {
         return request(app)
-          .patch("/api/articles/999999")
+          .patch("/api/articles/banana")
           .send({ inc_votes: 1 })
-          .expect(404)
+          .expect(400)
           .then(({ body }) => {
-            expect(body.msg).toBe("Article not found");
+            expect(body.msg).toBe("Invalid input");
           });
       });
     });
@@ -215,7 +205,7 @@ describe("/api/articles/:article_id", () => {
     describe("Status 404", () => {
       it("Not found when article_id does not exist", () => {
         return request(app)
-          .patch("/api/articles/9999")
+          .patch("/api/articles/999999")
           .send({ inc_votes: 1 })
           .expect(404)
           .then(({ body }) => {
@@ -229,6 +219,14 @@ describe("/api/articles/:article_id", () => {
 describe("/api/articles/:article_id/comments", () => {
   describe("GET", () => {
     describe("Status 200", () => {
+      it("should return an empty array of comments for an article without comments", () => {
+        return request(app)
+          .get("/api/articles/2/comments")
+          .expect(200)
+          .then((res) => {
+            expect(res.body.comments).toEqual([]);
+          });
+      });
       it("should respond with an array of comments for the given article_id", () => {
         return request(app)
           .get("/api/articles/1/comments")

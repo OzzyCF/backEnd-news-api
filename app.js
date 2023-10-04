@@ -10,6 +10,7 @@ const {
   patchVotesByArticleId,
   deleteComment,
   getAllTopics,
+  getUsers,
 } = require("./controllers/api.controller");
 const {
   handleCustomErrors,
@@ -30,6 +31,7 @@ app.get("/api/topics", getAllTopics);
 app.get("/api/articles", fetchArticles);
 app.get("/api/articles/:article_id", getArticleById);
 app.get("/api/articles/:article_id/comments", getArticleComments);
+app.get("/api/users", getUsers);
 
 ////////POST //////////////////
 app.post("/api/articles/:article_id/comments", postComment);
