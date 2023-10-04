@@ -63,8 +63,34 @@
       "404": "comment not found",
       "400": "Invalid article_id"
     }
+  },
+  "POST /api/articles/:article_id/comments": {
+    "description": "Add a comment to an article and returns the posted comment.",
+    "requires": {
+      "username": "String",
+      "body": "String"
+    },
+    "exampleRequest": {
+      "username": "butter_bridge",
+      "body": "This is my comment!"
+    },
+    "exampleResponse": {
+      "comment": {
+        "comment_id": 7,
+        "votes": 0,
+        "created_at": "2021-09-25T14:00:00.000Z",
+        "author": "butter_bridge",
+        "body": "This is my comment!",
+        "article_id": 5
+      }
+    },
+    "errors": {
+      "400": "Invalid input",
+      "404": "Article not found"
+    }
   }
 }
+
 
 
 

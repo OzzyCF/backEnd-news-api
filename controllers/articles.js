@@ -34,7 +34,14 @@ exports.getArticleComments = (req, res, next) => {
       return fetchCommentsByArticleId(article_id);
     })
     .then((comments) => {
-      res.status(200).send({ comments });
+      if (comments.length === 0) {
+        res.status(200).send({
+          message: "No comments found for this article.",
+          comments: [],
+        });
+      } else {
+        res.status(200).send({ comments });
+      }
     })
     .catch(next);
 };

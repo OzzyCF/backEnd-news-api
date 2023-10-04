@@ -109,12 +109,18 @@ describe("/api/articles/:article_id/comments", () => {
           .expect(200)
           .then(({ body }) => {
             expect(body.comments).toBeInstanceOf(Array);
-            expect(body.comments[0]).toHaveProperty("comment_id");
-            expect(body.comments[0]).toHaveProperty("votes");
-            expect(body.comments[0]).toHaveProperty("created_at");
-            expect(body.comments[0]).toHaveProperty("author");
-            expect(body.comments[0]).toHaveProperty("body");
-            expect(body.comments[0]).toHaveProperty("article_id");
+
+            // Iterate over each comment and check properties
+            body.comments.forEach((comment) => {
+              expect(comment).toHaveProperty("comment_id");
+              expect(comment).toHaveProperty("votes");
+              expect(comment).toHaveProperty("created_at");
+              expect(comment).toHaveProperty("author");
+              expect(comment).toHaveProperty("body");
+
+              // Check that the article_id is correct
+              expect(comment).toHaveProperty("article_id", 1);
+            });
           });
       });
 
