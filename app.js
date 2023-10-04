@@ -7,7 +7,13 @@ const {
   fetchArticles,
   getArticleComments,
   postComment,
+  patchVotesByArticleId,
 } = require("./controllers/articles");
+const {
+  handleCustomErrors,
+  handlePsqlErrors,
+  handleServerErrors,
+} = require("./errors/index.js");
 
 // Use the built-in Express JSON parser middleware
 app.use(express.json());
@@ -26,13 +32,10 @@ app.get("/api/articles/:article_id/comments", getArticleComments);
 ////////POST //////////////////
 app.post("/api/articles/:article_id/comments", postComment);
 
-// ERROR HANDLING
-const {
-  handleCustomErrors,
-  handlePsqlErrors,
-  handleServerErrors,
-} = require("./errors/index.js");
+//////PATCH///////////////////
+app.patch("/api/articles/:article_id", patchVotesByArticleId);
 
+// ERROR HANDLING
 app.all("*", (req, res, next) => {
   res.status(404).send({ msg: "Route Not Found" });
 });

@@ -12,6 +12,49 @@ afterAll(() => {
   return db.end();
 });
 
+describe("/api/articles", () => {
+  describe("GET", () => {
+    describe("Status 200", () => {
+      it("should return all articles with the correct structure and without body", () => {
+        return request(app)
+          .get("/api/articles")
+          .expect(200)
+          .then(({ body }) => {
+            // Check if it's an array
+            expect(body.articles).toBeInstanceOf(Array);
+
+            // Iterate through all articles and check their structure
+            body.articles.forEach((article) => {
+              expect(article).toMatchObject({
+                author: expect.any(String),
+                title: expect.any(String),
+                article_id: expect.any(Number),
+                topic: expect.any(String),
+                created_at: expect.any(String),
+                votes: expect.any(Number),
+                article_img_url: expect.any(String),
+                comment_count: expect.any(Number),
+              });
+              // Check for the absence of the body property for each article
+              expect(article).not.toHaveProperty("body");
+            });
+          });
+      });
+
+      it("should return articles sorted by date in descending order", () => {
+        return request(app)
+          .get("/api/articles")
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.articles).toBeSortedBy("created_at", {
+              descending: true,
+            });
+          });
+      });
+    });
+  });
+});
+
 describe("/api/articles/:article_id", () => {
   describe("GET", () => {
     describe("Status 200", () => {
@@ -55,45 +98,128 @@ describe("/api/articles/:article_id", () => {
       });
     });
   });
-});
-
-describe("/api/articles", () => {
-  describe("GET", () => {
+  describe("PATCH", () => {
     describe("Status 200", () => {
-      it("should return all articles with the correct structure and without body", () => {
+      it("Should increment votes by 1", () => {
+        let initialVoteCount;
+
+        // First, fetch the article to get the current vote count
         return request(app)
-          .get("/api/articles")
+          .get("/api/articles/1")
+          .then(({ body }) => {
+            initialVoteCount = body.article.votes;
+
+            // Then, make the PATCH request to increment the votes
+            return request(app)
+              .patch("/api/articles/1")
+              .send({ inc_votes: 1 })
+              .expect(200);
+          })
+          .then(({ body }) => {
+            // Now compare the updated vote count with the expected value
+            expect(body.article.votes).toBe(initialVoteCount + 1);
+          });
+      });
+
+      it("Should decrement votes by 100", () => {
+        // First, fetch the initial vote count.
+        return request(app)
+          .get("/api/articles/1")
           .expect(200)
           .then(({ body }) => {
-            // Check if it's an array
-            expect(body.articles).toBeInstanceOf(Array);
+            const initialVotes = body.article.votes;
 
-            // Iterate through all articles and check their structure
-            body.articles.forEach((article) => {
-              expect(article).toMatchObject({
-                author: expect.any(String),
-                title: expect.any(String),
-                article_id: expect.any(Number),
-                topic: expect.any(String),
-                created_at: expect.any(String),
-                votes: expect.any(Number),
-                article_img_url: expect.any(String),
-                comment_count: expect.any(Number),
-              });
-              // Check for the absence of the body property for each article
-              expect(article).not.toHaveProperty("body");
+            // Then, send the PATCH request to decrement the votes.
+            return {
+              request: request(app)
+                .patch("/api/articles/1")
+                .send({ inc_votes: -100 })
+                .expect(200),
+              initialVotes: initialVotes,
+            };
+          })
+          .then(({ request, initialVotes }) => {
+            return request.then(({ body }) => {
+              expect(body.article.votes).toBe(initialVotes - 100);
             });
           });
       });
 
-      it("should return articles sorted by date in descending order", () => {
+      it("Responds with the updated article", () => {
+        // First, fetch the initial vote count.
         return request(app)
-          .get("/api/articles")
+          .get("/api/articles/1")
           .expect(200)
           .then(({ body }) => {
-            expect(body.articles).toBeSortedBy("created_at", {
-              descending: true,
+            const initialVotes = body.article.votes;
+
+            // Then, send the PATCH request to increment the votes by 5.
+            return {
+              request: request(app)
+                .patch("/api/articles/1")
+                .send({ inc_votes: 5 })
+                .expect(200),
+              initialVotes: initialVotes,
+            };
+          })
+          .then(({ request, initialVotes }) => {
+            return request.then(({ body }) => {
+              expect(body.article.votes).toBe(initialVotes + 5);
             });
+          });
+      });
+      it("should return an empty array of comments for an article without comments", (done) => {
+        request(app)
+          .get("/api/articles/2/comments")
+          .expect(200)
+          .end((err, res) => {
+            if (err) return done(err);
+            expect(res.body.comments).toEqual([]);
+            done();
+          });
+      });
+    });
+
+    describe("Status 400", () => {
+      it("Bad request when inc_votes is not a number", () => {
+        return request(app)
+          .patch("/api/articles/1")
+          .send({ inc_votes: "five" })
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).toBe("Bad Request: Invalid inc_votes input");
+          });
+      });
+
+      it("Bad request when no inc_votes is provided in the body", () => {
+        return request(app)
+          .patch("/api/articles/1")
+          .send({})
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).toBe("Bad Request: inc_votes is required");
+          });
+      });
+
+      it("Bad request when article_id does not exist", () => {
+        return request(app)
+          .patch("/api/articles/999999") // Assuming 999999 is a non-existent article ID
+          .send({ inc_votes: 1 })
+          .expect(404)
+          .then(({ body }) => {
+            expect(body.msg).toBe("Article not found");
+          });
+      });
+    });
+
+    describe("Status 404", () => {
+      it("Not found when article_id does not exist", () => {
+        return request(app)
+          .patch("/api/articles/9999")
+          .send({ inc_votes: 1 })
+          .expect(404)
+          .then(({ body }) => {
+            expect(body.msg).toBe("Article not found");
           });
       });
     });
