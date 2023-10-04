@@ -25,7 +25,9 @@
         }
       ]
     }
+
   },
+  
   "GET /api/articles/:article_id": {
     "description": "Returns an article object for the given article_id.",
     "queries": [],
@@ -119,7 +121,18 @@
       "404": "Comment not found",
       "400": "Invalid comment_id"
     }
-  }
+  },
+  
+    "GET /api/articles?": {
+      "description": "returns all articles",
+      "queries": ["topic"],
+      "exampleResponse": {
+        "articles": ["article"]
+      }
+    }
+  
+  
+
 }
 
 

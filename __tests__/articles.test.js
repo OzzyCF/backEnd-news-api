@@ -51,6 +51,31 @@ describe("/api/articles", () => {
             });
           });
       });
+
+      it("should return articles filtered by topic when topic query is provided", () => {
+        return request(app)
+          .get("/api/articles?topic=coding")
+          .expect(200)
+          .then(({ body }) => {
+            expect(body).toHaveProperty("articles");
+            expect(body.articles).toBeInstanceOf(Array);
+            body.articles.forEach((article) => {
+              expect(article.topic).toBe("coding");
+            });
+          });
+      });
+      it("should return all articles when a non-existent topic is provided", () => {
+        return request(app)
+          .get("/api/articles?topic=nonExistentTopic")
+          .expect(200)
+          .then(({ body }) => {
+            expect(body).toHaveProperty("articles");
+            expect(body.articles).toBeInstanceOf(Array);
+            body.articles.forEach((article) => {
+              expect(article.topic).not.toBe("nonExistentTopic");
+            });
+          });
+      });
     });
   });
 });
