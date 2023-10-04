@@ -203,7 +203,7 @@ describe("/api/articles/:article_id", () => {
 
       it("Bad request when article_id does not exist", () => {
         return request(app)
-          .patch("/api/articles/999999") // Assuming 999999 is a non-existent article ID
+          .patch("/api/articles/999999")
           .send({ inc_votes: 1 })
           .expect(404)
           .then(({ body }) => {
@@ -236,7 +236,6 @@ describe("/api/articles/:article_id/comments", () => {
           .then(({ body }) => {
             expect(body.comments).toBeInstanceOf(Array);
 
-            // Iterate over each comment and check properties
             body.comments.forEach((comment) => {
               expect(comment).toHaveProperty("comment_id");
               expect(comment).toHaveProperty("votes");
@@ -244,7 +243,6 @@ describe("/api/articles/:article_id/comments", () => {
               expect(comment).toHaveProperty("author");
               expect(comment).toHaveProperty("body");
 
-              // Check that the article_id is correct
               expect(comment).toHaveProperty("article_id", 1);
             });
           });
@@ -318,7 +316,7 @@ describe("POST", () => {
         .send(newComment)
         .expect(400)
         .then(({ body }) => {
-          expect(body.msg).toBe("Invalid input"); // Or whatever error message you have set for this case.
+          expect(body.msg).toBe("Invalid input");
         });
     });
 
@@ -332,7 +330,7 @@ describe("POST", () => {
         .send(newComment)
         .expect(400)
         .then(({ body }) => {
-          expect(body.msg).toBe("Invalid input"); // Adjust as needed.
+          expect(body.msg).toBe("Invalid input");
         });
     });
   });
