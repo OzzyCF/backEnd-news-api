@@ -25,7 +25,14 @@ exports.getArticleById = (req, res, next) => {
 exports.fetchArticles = (req, res, next) => {
   selectArticles(req.query)
     .then((articles) => {
-      res.status(200).send({ articles });
+      if (articles.length === 0 && req.query.topic) {
+        res.status(200).send({
+          message: `No articles found for topic "${req.query.topic}".`,
+          articles: [],
+        });
+      } else {
+        res.status(200).send({ articles });
+      }
     })
     .catch(next);
 };

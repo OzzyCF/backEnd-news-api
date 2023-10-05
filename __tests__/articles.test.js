@@ -57,23 +57,21 @@ describe("/api/articles", () => {
           .get("/api/articles?topic=coding")
           .expect(200)
           .then(({ body }) => {
-            expect(body).toHaveProperty("articles");
-            expect(body.articles).toBeInstanceOf(Array);
             body.articles.forEach((article) => {
               expect(article.topic).toBe("coding");
             });
           });
       });
-      it("should return all articles when a non-existent topic is provided", () => {
+      it("should return no articles when a non-existent topic is provided", () => {
         return request(app)
           .get("/api/articles?topic=nonExistentTopic")
           .expect(200)
           .then(({ body }) => {
-            expect(body).toHaveProperty("articles");
-            expect(body.articles).toBeInstanceOf(Array);
-            body.articles.forEach((article) => {
-              expect(article.topic).not.toBe("nonExistentTopic");
-            });
+            expect(body.articles.length).toBe(0); // Expecting the articles array to be empty
+            expect(body).toHaveProperty("message");
+            expect(body.message).toBe(
+              `No articles found for topic "nonExistentTopic".`
+            );
           });
       });
     });
@@ -83,7 +81,7 @@ describe("/api/articles", () => {
 describe("/api/articles/:article_id", () => {
   describe("GET", () => {
     describe("Status 200", () => {
-      it("should return an article with the correct structure", () => {
+      it("should return an article with the correct structure and comment_count", () => {
         return request(app)
           .get("/api/articles/1")
           .expect(200)
@@ -96,6 +94,7 @@ describe("/api/articles/:article_id", () => {
               created_at: expect.any(String),
               votes: expect.any(Number),
               article_img_url: expect.any(String),
+              comment_count: expect.any(Number),
             });
           });
       });
@@ -177,8 +176,6 @@ describe("/api/articles/:article_id", () => {
           .expect(200)
           .then(({ body }) => {
             const initialVotes = body.article.votes;
-
-            // Then, send the PATCH request to increment the votes by 5.
             return {
               request: request(app)
                 .patch("/api/articles/1")

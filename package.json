@@ -4,8 +4,10 @@
   "description": "bc-nc-news",
   "main": "index.js",
   "scripts": {
+    "start": "node listen.js",
     "setup-dbs": "psql -f ./db/setup.sql",
     "seed": "node ./db/seeds/run-seed.js",
+    "seed-prod": "NODE_ENV=production node .db/run-seed.js",
     "test": "jest --runInBand",
     "prepare": "husky install",
     "queryTest": "psql -d nc_news_test -f queryTester.sql > queryTest.txt"
