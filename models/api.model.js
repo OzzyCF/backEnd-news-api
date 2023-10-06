@@ -29,6 +29,14 @@ exports.selectArticles = (queryParams) => {
     LEFT JOIN comments ON articles.article_id = comments.article_id`;
 
   const values = [];
+  const validColumns = [
+    "author",
+    "title",
+    "article_id",
+    "topic",
+    "created_at",
+    "votes",
+  ];
 
   if (queryParams.topic) {
     query += ` WHERE articles.topic = $${values.length + 1}`;
@@ -45,8 +53,22 @@ exports.selectArticles = (queryParams) => {
   }
 
   query += `
-    GROUP BY articles.article_id
-    ORDER BY articles.created_at DESC`;
+    GROUP BY articles.article_id`;
+
+  if (queryParams.sort_by && validColumns.includes(queryParams.sort_by)) {
+    query += ` ORDER BY articles.${queryParams.sort_by}`;
+  } else {
+    query += ` ORDER BY articles.created_at`; // default
+  }
+
+  if (
+    queryParams.order &&
+    (queryParams.order === "asc" || queryParams.order === "desc")
+  ) {
+    query += ` ${queryParams.order.toUpperCase()}`;
+  } else {
+    query += ` DESC`; // default
+  }
 
   return db.query(query, values).then(({ rows }) => {
     return rows;

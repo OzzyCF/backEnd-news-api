@@ -1,7 +1,8 @@
 const express = require("express");
 const app = express();
-
 const endpoints = require("./endpoints.json");
+
+// Controllers
 const {
   getArticleById,
   fetchArticles,
@@ -12,40 +13,40 @@ const {
   getAllTopics,
   getUsers,
 } = require("./controllers/api.controller");
+
+// Error handlers
 const {
   handleCustomErrors,
   handlePsqlErrors,
   handleServerErrors,
 } = require("./errors/index.js");
 
-// Use the built-in Express JSON parser middleware
-app.use(express.json());
+// Middleware
+app.use(express.json()); // Built-in Express JSON parser
 
-// Documentation route
-app.get("/api", (req, res) => {
-  res.status(200).send(endpoints);
-});
+// Routes
+app.get("/api", (req, res) => res.status(200).send(endpoints)); // Documentation route
 
-//////// GET ////////////////
+// GET Routes
 app.get("/api/topics", getAllTopics);
 app.get("/api/articles", fetchArticles);
 app.get("/api/articles/:article_id", getArticleById);
 app.get("/api/articles/:article_id/comments", getArticleComments);
 app.get("/api/users", getUsers);
 
-////////POST //////////////////
+// POST Routes
 app.post("/api/articles/:article_id/comments", postComment);
 
-//////PATCH///////////////////
+// PATCH Routes
 app.patch("/api/articles/:article_id", patchVotesByArticleId);
 
-//////DELETE/////////////////
+// DELETE Routes
 app.delete("/api/comments/:comment_id", deleteComment);
-// ERROR HANDLING
-app.all("*", (req, res, next) => {
-  res.status(404).send({ msg: "Route Not Found" });
-});
 
+// Handle unmatched routes
+app.all("*", (req, res) => res.status(404).send({ msg: "Route Not Found" }));
+
+// Error handling
 app.use(handleCustomErrors);
 app.use(handlePsqlErrors);
 app.use(handleServerErrors);

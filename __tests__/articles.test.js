@@ -75,6 +75,59 @@ describe("/api/articles", () => {
           });
       });
     });
+    describe("Status 200 - Sorting", () => {
+      it("should sort articles by a specified column in ascending order", () => {
+        return request(app)
+          .get("/api/articles?sort_by=title&order=asc")
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.articles).toBeSortedBy("title", {
+              descending: false,
+            });
+          });
+      });
+
+      it("should sort articles by a specified column in descending order", () => {
+        return request(app)
+          .get("/api/articles?sort_by=votes&order=desc")
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.articles).toBeSortedBy("votes", {
+              descending: true,
+            });
+          });
+      });
+
+      it("should default to sorting by 'created_at' column in descending order if no query parameters provided", () => {
+        return request(app)
+          .get("/api/articles")
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.articles).toBeSortedBy("created_at", {
+              descending: true,
+            });
+          });
+      });
+    });
+    describe("Status 400 - Sorting Errors", () => {
+      it("should return 400 if provided with an invalid column to sort by", () => {
+        return request(app)
+          .get("/api/articles?sort_by=invalidColumnName")
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).toBe("Bad Request: Invalid sort_by column");
+          });
+      });
+
+      it("should return 400 if provided with an invalid order value", () => {
+        return request(app)
+          .get("/api/articles?order=invalidOrder")
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).toBe("Bad Request: Invalid order value");
+          });
+      });
+    });
   });
 });
 
@@ -209,7 +262,7 @@ describe("/api/articles/:article_id", () => {
           .send({})
           .expect(400)
           .then(({ body }) => {
-            expect(body.msg).toBe("Bad Request: inc_votes is required");
+            expect(body.msg).toBe("Bad Request: Invalid inc_votes input");
           });
       });
 
