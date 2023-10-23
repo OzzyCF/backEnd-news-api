@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const endpoints = require("./endpoints.json");
+const cors = require("cors");
 
 // Controllers
 const {
@@ -22,6 +23,7 @@ const {
 } = require("./errors/index.js");
 
 // Middleware
+app.use(cors());
 app.use(express.json()); // Built-in Express JSON parser
 
 // Routes
